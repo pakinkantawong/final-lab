@@ -1,6 +1,6 @@
 # Final Lab – Task Management System
 
-โปรเจกต์นี้เป็นส่วนหนึ่งของรายวิชา ENGSE207  
+final-lab-set1 นี้เป็นส่วนหนึ่งของรายวิชา ENGSE207 Software Architecture
 เป็นระบบจัดการงาน (Task Management System) ที่พัฒนาด้วยสถาปัตยกรรม Microservices โดยใช้ Node.js, Express และ PostgreSQL
 
 ---
