@@ -124,7 +124,5 @@ cp .env.example .env
 
 
 3. Run docker
-
-
 docker compose up -d --build
 ---
