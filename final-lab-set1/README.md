@@ -30,6 +30,7 @@
 ---
 
 ## Project Structure
+```
 final-lab-set1/
 ├── README.md
 ├── docker-compose.yml
@@ -93,8 +94,36 @@ final-lab-set1/
     ├── 10_logs_api.png
     ├── 11_rate_limit.png
     └── 12_frontend_screenshot.png
+```
+ 
 ---
-
+ 
+## 🏗️ Architecture
+ 
+```
+Client (Browser)
+       │  HTTPS
+       ▼
+  ┌─────────┐
+  │  Nginx  │  (Reverse Proxy + SSL Termination)
+  └────┬────┘
+       │
+  ┌────┴───────────────────────┐
+  │                            │
+  ▼                            ▼
+┌──────────────┐    ┌──────────────────┐    ┌─────────────┐
+│ Auth Service │    │  Task Service    │    │ Log Service │
+│  (Node.js)   │    │   (Node.js)      │    │  (Node.js)  │
+└──────┬───────┘    └────────┬─────────┘    └──────┬──────┘
+       │                     │                      │
+       └──────────┬──────────┘                      │
+                  ▼                                  │
+           ┌────────────┐                            │
+           │ PostgreSQL │◄───────────────────────────┘
+           └────────────┘
+```
+ 
+---
 ## Requirements
 
 ก่อนรันโปรเจกต์ต้องติดตั้ง
