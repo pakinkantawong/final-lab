@@ -30,19 +30,69 @@
 ---
 
 ## Project Structure
-final-lab-set1
-│
-├── auth-service
-├── task-service
-├── log-service
-├── frontend
-├── db
-├── nginx
-├── screenshots
-├── scripts
+final-lab-set1/
+├── README.md
 ├── docker-compose.yml
-└── README.md
-
+├── .env.example
+├── .gitignore
+│
+├── nginx/
+│   ├── nginx.conf              # HTTPS + reverse proxy config
+│   ├── Dockerfile
+│   └── certs/
+│       ├── cert.pem
+│       └── key.pem
+│
+├── frontend/
+│   ├── Dockerfile
+│   ├── index.html              # Task Board UI (Login + CRUD Tasks + JWT inspector)
+│   └── logs.html               # Log Dashboard (ดึงจาก /api/logs)
+│
+├── auth-service/
+│   ├── Dockerfile
+│   ├── package.json
+│   └── src/
+│       ├── index.js
+│       ├── routes/auth.js
+│       ├── middleware/jwtUtils.js
+│       └── db/db.js
+│
+├── task-service/
+│   ├── Dockerfile
+│   ├── package.json
+│   └── src/
+│       ├── index.js
+│       ├── routes/tasks.js
+│       ├── middleware/
+│       │   ├── authMiddleware.js
+│       │   └── jwtUtils.js
+│       └── db/db.js
+│
+├── log-service/
+│   ├── Dockerfile
+│   ├── package.json
+│   └── src/
+│       └── index.js
+│
+├── db/
+│   └── init.sql                # Schema + Seed Users ทั้งหมด
+│
+├── scripts/
+│   └── gen-certs.sh            # สร้าง self-signed cert
+│
+└── screenshots/
+    ├── 01_docker_running.png
+    ├── 02_https_browser.png
+    ├── 03_login_success.png
+    ├── 04_login_fail.png
+    ├── 05_create_task.png
+    ├── 06_get_tasks.png
+    ├── 07_update_task.png
+    ├── 08_delete_task.png
+    ├── 09_no_jwt_401.png
+    ├── 10_logs_api.png
+    ├── 11_rate_limit.png
+    └── 12_frontend_screenshot.png
 ---
 
 ## Requirements
