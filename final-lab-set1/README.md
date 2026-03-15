@@ -129,9 +129,9 @@ cp .env.example .env
 
 3.สร้าง Self-Signed Certificate
 ```openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
-  -keyout nginx/certs/key.pem \
-  -out    nginx/certs/cert.pem \
-  -subj "/C=TH/ST=Bangkok/L=Bangkok/O=RMUTL/OU=ENGCE301/CN=localhost"
+keyout nginx/certs/key.pem \
+out    nginx/certs/cert.pem \
+subj "/C=TH/ST=Bangkok/L=Bangkok/O=RMUTL/OU=ENGCE301/CN=localhost"
 echo "✅ Certificate created in nginx/certs/"```
 
 chmod +x scripts/gen-certs.sh
