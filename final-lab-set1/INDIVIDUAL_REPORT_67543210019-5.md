@@ -1,4 +1,4 @@
-# INDIVIDUAL_REPORT_6743210019-5
+# INDIVIDUAL_REPORT_6743210062-5
 
 ---
 
@@ -6,94 +6,95 @@
 
 | | |
 |---|---|
-| **ชื่อ-นามสกุล** | นายธวัชชัย สุหงษา |
-| **รหัสนักศึกษา** | 6743210019-5 |
+| **ชื่อ-นามสกุล** | นายภาคิน กันทะวงค์ |
+| **รหัสนักศึกษา** | 6743210062-5 |
 | **กลุ่ม** | TEAM8 |
-| **เพื่อนร่วมกลุ่ม** | นายภาคิน กันทะวงค์ (6743210062-5) |
+| **เพื่อนร่วมกลุ่ม** | นายธวัชชัย สุหงษา (6743210019-5) |
 
 ---
 
 ## 1. ส่วนที่รับผิดชอบ
 
-รับผิดชอบด้าน **Documentation และ Quality Assurance** ของโปรเจกต์ ครอบคลุม 2 ส่วนหลัก ได้แก่
+รับผิดชอบด้าน **Backend และ Infrastructure** ทั้งหมดของโปรเจกต์ ครอบคลุม 6 ส่วนหลัก ได้แก่
 
-- **README & Screenshots** — จัดทำ `README.md` แบบ 2 ภาษา (ไทย/อังกฤษ) พร้อมถ่าย screenshots ครบทั้ง 12 ขั้นตอน ตั้งแต่ docker running จนถึง rate limit
-- **Architecture Diagram** — ออกแบบ diagram แสดง request flow, JWT flow และความสัมพันธ์ระหว่าง services และ database ทั้งในรูปแบบ ASCII สำหรับ README และไฟล์ `.drawio`
-
-นอกจากนี้ยังร่วมกับ Student 1 ในส่วน **Shared Responsibilities** ได้แก่ การทดสอบ end-to-end และการตรวจสอบ edge cases ร่วมกัน
+- **Auth Service** — พัฒนา API สำหรับ register และ login รวมถึงการออก JWT Token และจัดการ password hashing ด้วย bcrypt
+- **JWT Login Flow** — ออกแบบและ implement การ sign/verify Token ผ่าน `jwtUtils.js` ที่ใช้ร่วมกันระหว่าง Auth Service และ Task Service
+- **HTTPS Certificate & Nginx** — สร้าง self-signed certificate ด้วย `gen-certs.sh` และตั้งค่า `nginx.conf` ให้รองรับ SSL termination, reverse proxy routing และ rate limiting
+- **Task Service** — พัฒนา CRUD API สำหรับจัดการ Task และ implement `authMiddleware.js` เพื่อป้องกัน endpoint ด้วย JWT
+- **Log Service** — พัฒนา service สำหรับรวบรวมและ expose log การใช้งาน API ผ่าน `GET /api/logs`
+- **Frontend & Docker Compose** — พัฒนา `index.html` (Task Board + JWT Inspector) และ `logs.html` รวมถึงเขียน `docker-compose.yml` เพื่อ orchestrate ทุก container ให้ทำงานร่วมกัน
 
 ---
 
 ## 2. สิ่งที่ได้ลงมือพัฒนาด้วยตนเอง
 
-### ทดสอบ API ครอบคลุมทุก Endpoint
-- ทดสอบ `POST /api/auth/login` และ `POST /api/auth/register` ด้วย curl และ Postman ทั้ง success case และ error case เช่น wrong password, missing fields
-- ทดสอบ Task API ครบทุก method (`GET`, `POST`, `PUT`, `DELETE /api/tasks`) โดยแนบ JWT Token ที่ถูกต้อง
-- ทดสอบการส่ง request โดยไม่มี JWT Token เพื่อยืนยันว่าระบบส่ง `401 Unauthorized` กลับอย่างถูกต้อง
-- ทดสอบ rate limiting โดยส่ง request ซ้ำในเวลาสั้น เพื่อยืนยันพฤติกรรมของ Nginx
-- ร่วมทดสอบ end-to-end flow กับ Student 1 ตั้งแต่ login → รับ token → ใช้ token เรียก task API → ตรวจสอบ log
-- ตรวจสอบ edge cases ร่วมกัน เช่น expired token, missing token, invalid credentials และ rate limit exceeded
+### Auth Service (`auth-service/src/`)
+- เขียน `routes/auth.js` สำหรับ `POST /api/auth/register` และ `POST /api/auth/login`
+- เขียน `middleware/jwtUtils.js` สำหรับ sign และ verify JWT Token โดยอ่าน secret จาก environment variable
+- ตั้งค่าการเชื่อมต่อ PostgreSQL ผ่าน `db/db.js`
+- Implement password hashing ด้วย bcrypt ก่อน save และใช้ `bcrypt.compare()` ตอน login
 
-### ตรวจสอบ HTTPS
-- เปิด browser ไปที่ `https://localhost` และยืนยันว่า self-signed certificate ทำงานได้
-- บันทึกขั้นตอนการ bypass คำเตือน SSL ไว้ใน README เพื่อให้ผู้อื่นทราบ
+### Task Service (`task-service/src/`)
+- เขียน `routes/tasks.js` สำหรับ CRUD endpoints ครบทั้ง `GET`, `POST`, `PUT`, `DELETE /api/tasks`
+- เขียน `middleware/authMiddleware.js` ตรวจสอบ JWT Token ทุก request ก่อนอนุญาตให้เข้าถึง resource
+- แชร์ `jwtUtils.js` ให้ verify ด้วย JWT_SECRET เดียวกันกับ Auth Service
 
-### จัดเตรียม Screenshots (12 ภาพ)
-- วางแผนลำดับการทดสอบให้สอดคล้องกับ 12 screenshots ที่กำหนด
-- ถ่ายและตั้งชื่อไฟล์ให้ตรงกับที่ระบุใน README ทุกภาพ ตั้งแต่ `01_docker_running.png` ถึง `12_frontend_screenshot.png`
+### Log Service (`log-service/src/`)
+- เขียน `index.js` สำหรับรวบรวม API activity log และ expose ผ่าน `GET /api/logs`
 
-### จัดทำ README.md
-- เขียน `README.md` แบบ 2 ภาษา (ไทย/อังกฤษ) ครอบคลุมทุก section ดังนี้
-  - Architecture (ASCII diagram)
-  - Project Structure (file tree)
-  - Tech Stack
-  - Setup & Installation (ขั้นตอนทีละขั้น)
-  - API Endpoints พร้อม curl examples
-  - Authentication Flow
-  - Frontend usage
-  - Screenshots table ครบ 12 ภาพ
-  - Environment Variables
+### Nginx & HTTPS (`nginx/`)
+- เขียน `nginx.conf` ตั้งค่า reverse proxy routing ตาม path prefix
+  - `/api/auth/*` → auth-service:3001
+  - `/api/tasks/*` → task-service:3002
+  - `/api/logs/*` → log-service:3003
+- ตั้งค่า SSL termination รับ HTTPS :443 แล้วส่งต่อเป็น HTTP ภายใน container
+- เพิ่ม rate limiting ป้องกัน request ที่มากเกินกำหนด
 
-### จัดทำ TEAM8.md และ Architecture Diagram
-- เขียน `TEAM8.md` อธิบาย Work Allocation, Reason for Work Split และ Integration Notes
-- ออกแบบ Architecture Diagram แสดง routing path, JWT flow และ database connection ในรูปแบบ `.drawio` สำหรับ draw.io
+### Frontend (`frontend/`)
+- พัฒนา `index.html` ครอบคลุม Login form, Task CRUD และ JWT Inspector
+- พัฒนา `logs.html` ดึงข้อมูลจาก `/api/logs` แสดงเป็น Log Dashboard
+
+### Docker Compose & Infrastructure
+- เขียน `docker-compose.yml` กำหนด network, environment variables และ volume ให้ทุก container ทำงานร่วมกัน
+- เขียน `scripts/gen-certs.sh` สร้าง self-signed certificate อัตโนมัติ
+- เขียน `db/init.sql` สร้าง schema และ seed users เริ่มต้น
 
 ---
 
 ## 3. ปัญหาที่พบและวิธีการแก้ไข
 
-**ปัญหาที่ 1 — Login ด้วย seed users ไม่ได้ระหว่างทดสอบ**
+**ปัญหาที่ 1 — Seed users login ไม่ได้**
 
-ระหว่างทดสอบพบว่า login ด้วย username และ password จาก `db/init.sql` ไม่ผ่านทุกครั้ง ทั้งที่ข้อมูลดูถูกต้อง ประสานงานกับ Student 1 แล้วพบสาเหตุว่า password ใน init.sql เป็น plain text แต่ระบบใช้ bcrypt ตรวจสอบ แก้ไขโดยให้ Student 1 สร้าง bcrypt hash ใหม่และอัปเดตใน init.sql จากนั้นทดสอบใหม่จนผ่าน
+Password ใน `db/init.sql` ถูก insert เป็น plain text แต่ Auth Service ใช้ `bcrypt.compare()` ในการตรวจสอบ ทำให้ login ด้วย seed users ไม่ผ่านทุกครั้ง แก้ไขโดยสร้าง bcrypt hash ด้วย `bcrypt.hashSync()` แล้วนำ hash ที่ได้ไปแทนที่ค่าเดิมใน `db/init.sql` จากนั้น rebuild container ใหม่
 
-**ปัญหาที่ 2 — Browser แจ้งเตือน SSL Certificate ทุกครั้ง**
+**ปัญหาที่ 2 — JWT Secret ไม่ตรงกันระหว่าง Auth Service และ Task Service**
 
-เนื่องจากใช้ self-signed certificate browser แจ้งเตือน "Your connection is not private" ทุกครั้งที่เปิด แก้ไขโดยคลิก Advanced → Proceed to localhost และเพิ่มขั้นตอนนี้ไว้ใน README ส่วน Notes เพื่อให้ผู้อ่านทราบว่าเป็นพฤติกรรมปกติสำหรับ development environment
+แต่ละ service ใช้ `JWT_SECRET` คนละค่าในช่วงแรก ทำให้ Token ที่ออกโดย Auth Service ถูก verify ไม่ผ่านใน Task Service แก้ไขโดยกำหนด `JWT_SECRET` เป็น environment variable เดียวใน `docker-compose.yml` และให้ทั้งสอง service อ่านจากตัวแปรเดียวกัน
 
-**ปัญหาที่ 3 — Screenshots ถ่ายไม่ครบและลำดับไม่ตรง**
+**ปัญหาที่ 3 — Container เริ่มก่อน PostgreSQL พร้อม**
 
-ช่วงแรกถ่าย screenshots ไม่ครบและลำดับไม่ตรงกับที่กำหนด แก้ไขโดยวางแผนลำดับการทดสอบใหม่ให้ครบทั้ง 12 ภาพ แล้วถ่ายใหม่ทั้งหมดพร้อมตรวจสอบชื่อไฟล์ให้ตรงกับที่ระบุใน README ก่อน submit
+Auth Service และ Task Service พยายามเชื่อมต่อ database ทันทีที่ start แต่ PostgreSQL ยังไม่พร้อม ทำให้ connection ล้มเหลว แก้ไขโดยเพิ่ม `depends_on` ใน `docker-compose.yml` และเพิ่ม retry logic ใน `db/db.js` เพื่อรอจนกว่า database จะพร้อมรับ connection
 
-**ปัญหาที่ 4 — Architecture Diagram แสดง routing ไม่ชัดเจน**
+**ปัญหาที่ 4 — CORS error ระหว่าง Frontend กับ API**
 
-Diagram เวอร์ชันแรกไม่ได้แสดง path prefix ของแต่ละ route อย่างชัดเจน ทำให้อ่านแล้วไม่เข้าใจว่า request แต่ละประเภทไปที่ service ใด แก้ไขโดยเพิ่ม label `/api/auth`, `/api/tasks`, `/api/logs` บนเส้นลูกศรจาก Nginx และเปลี่ยนสีลูกศรให้แตกต่างกันแต่ละ service
+Frontend เรียก API แล้วเกิด CORS error เนื่องจาก service ภายในยังไม่ได้ตั้งค่า CORS header แก้ไขโดยเพิ่ม `cors()` middleware ใน Express ของแต่ละ service
 
 ---
 
 ## 4. สิ่งที่ได้เรียนรู้จากงานนี้
 
-- **Microservices Architecture** — เข้าใจการที่ระบบหนึ่งแบ่งออกเป็นหลาย service ที่ทำงานอิสระ และเห็นภาพชัดเจนว่า request เดินทางจาก browser ผ่าน Nginx ไปยัง service ต่างๆ อย่างไร
-- **JWT Authentication** — เข้าใจ flow ตั้งแต่การ login รับ token จนถึงการนำ token ไปใช้ใน Authorization header และเหตุใด token จึงหมดอายุและต้องขอใหม่
-- **Nginx Routing** — เข้าใจว่า path prefix เช่น `/api/auth` และ `/api/tasks` เป็นตัวกำหนดว่า request จะถูกส่งไปยัง service ใด ทำให้ frontend ใช้ origin เดียวโดยไม่ต้องรู้ port ของแต่ละ service
-- **Docker และ Container** — เรียนรู้การใช้ `docker compose ps` และ `docker compose logs` ตรวจสอบสถานะและ error ของแต่ละ container ระหว่างการทดสอบ
-- **API Testing อย่างเป็นระบบ** — ฝึกการทดสอบ API ด้วย curl ทั้ง happy path และ error case รวมถึงการทดสอบ edge cases เช่น missing token, expired token และ rate limit
+- **Microservices Architecture** — เข้าใจการแบ่งระบบออกเป็น service ย่อยที่แต่ละตัวมีหน้าที่ชัดเจน สื่อสารกันผ่าน HTTP API และ deploy แยกกันได้อิสระ
+- **JWT Authentication Flow** — เข้าใจกระบวนการครบ ตั้งแต่การ sign token ด้วย secret, การแนบ token ใน Authorization header และการ verify token ก่อนอนุญาตให้เข้าถึง resource
+- **Nginx as API Gateway** — เข้าใจการใช้ Nginx เป็น reverse proxy กระจาย request ไปยัง service ต่างๆ ตาม path พร้อม SSL termination และ rate limiting ในที่เดียว
+- **Docker Compose Networking** — เข้าใจการที่ container สื่อสารกันผ่านชื่อ service แทน IP address และการใช้ environment variable แชร์ค่าระหว่าง service
+- **bcrypt Password Hashing** — เข้าใจความสำคัญของการ hash password ก่อน save และข้อผิดพลาดที่เกิดจากการเก็บ plain text ลงฐานข้อมูล
 
 ---
 
 ## 5. แนวทางที่ต้องการพัฒนาต่อใน Set 2
 
-- **เพิ่ม Register API ใน Frontend** — ปัจจุบัน `index.html` รองรับแค่ Login หากเพิ่มหน้า Register จะทำให้ทดสอบการสมัครสมาชิกใหม่ผ่าน UI ได้โดยไม่ต้องใช้ curl
-- **ปรับปรุง Log Dashboard** — เพิ่มการกรอง log ตาม service หรือ time range และทำให้ `logs.html` รีเฟรชข้อมูลแบบ real-time แทนการโหลดครั้งเดียว
-- **เพิ่ม Automated Testing** — เขียน test script สำหรับทดสอบ API ทุก endpoint อัตโนมัติ เพื่อลดเวลาที่ต้องทดสอบด้วยมือทุกครั้งที่มีการเปลี่ยนแปลงโค้ด
-- **ปรับปรุง Documentation** — เพิ่ม API documentation ในรูปแบบ Swagger/OpenAPI เพื่อให้ผู้อื่นทดสอบ API ได้สะดวกขึ้นโดยไม่ต้องเขียน curl เอง
-- **Deploy บน Cloud** — ศึกษาการนำระบบไป deploy บน cloud platform เพื่อให้เข้าถึงได้จากภายนอก และเปลี่ยนจาก self-signed certificate เป็น Let's Encrypt
+- **Role-based Access Control (RBAC)** — เพิ่มระบบสิทธิ์ให้ user แต่ละคนมี role ต่างกัน เช่น admin สามารถดู task ของทุก user ได้ ส่วน user ทั่วไปเห็นได้เฉพาะ task ของตัวเอง
+- **Refresh Token Mechanism** — เพิ่ม refresh token เพื่อให้ user ไม่ต้อง login ใหม่เมื่อ access token หมดอายุ แทนที่จะใช้ token อายุยาว
+- **Centralized Logging** — ปรับปรุง Log Service ให้รับ log จากทุก service แบบ real-time แทนการเก็บแยกกัน เช่น ใช้ message queue อย่าง Redis หรือ RabbitMQ
+- **Health Check Endpoints** — เพิ่ม `/health` endpoint ในทุก service เพื่อให้ Nginx และ monitoring system ตรวจสอบสถานะได้
+- **Deploy บน Cloud** — นำระบบไป deploy บน cloud platform เช่น AWS หรือ GCP โดยเปลี่ยนจาก self-signed certificate เป็น Let's Encrypt
