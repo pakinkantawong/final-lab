@@ -132,7 +132,15 @@ final-lab-set1/
 └── screenshots/
     ├── 01_docker_running.png
     ├── 02_https_browser.png
-    └── ...
+    └── 03_login_success.png
+    └── 04_login_fail.png
+    └── 05_create_task.png
+    └── 06_get_tasks.png
+    └── 07_update_task.png
+    └── 08_delete_task.png
+    └── 09_no_jwt_401.png
+    └── 10_logs_api.png
+    └── 11_rate_limit.png
 ```
 
 ---
