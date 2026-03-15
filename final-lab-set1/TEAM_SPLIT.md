@@ -1,3 +1,9 @@
+# TEAM_SPLIT.md
+
+## ข้อมูลกลุ่ม
+- กลุ่มที่: 8
+- รายวิชา: ENGSE207 Software Architecture
+
 ## Team Members
 
 | รหัสนักศึกษา | ชื่อ-นามสกุล |
