@@ -133,7 +133,7 @@ cp .env.example .env
   -out    nginx/certs/cert.pem \
   -subj "/C=TH/ST=Bangkok/L=Bangkok/O=RMUTL/OU=ENGCE301/CN=localhost"
 echo "✅ Certificate created in nginx/certs/"```
-```
+
 chmod +x scripts/gen-certs.sh
 ./scripts/gen-certs.sh
 ```
